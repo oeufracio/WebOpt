@@ -1,15 +1,18 @@
 //npm init
-//npm install --save-dev gulp browser-sync run-sequence gulp-useref gulp-if gulp-htmlmin gulp-uglify gulp-clean-css gulp-imagemin del
+//npm install --save-dev gulp browser-sync run-sequence gulp-htmlmin gulp-uglify jshint gulp-jshint gulp-clean-css gulp-imagemin imagemin-optipng imagemin-jpegtran del
 var gulp = require('gulp');
 var browserSync = require('browser-sync');
 var runsequence = require('run-sequence');
-var useref = require('gulp-useref');
-var gulpif = require('gulp-if');
 var htmlmin = require('gulp-htmlmin');
 var uglify = require('gulp-uglify');
-var minifyCss = require('gulp-clean-css');
+var jshint = require('gulp-jshint');
+var cleanCSS = require('gulp-clean-css');
 var imagemin = require('gulp-imagemin');
+var optipng = require('imagemin-optipng');
+var jpegtran = require('imagemin-jpegtran');
+var gulpif = require('gulp-if');
 var del = require('del');
+
 
 
 // DEVELOPMENT TASKS
@@ -32,36 +35,71 @@ gulp.task('watch', function() {
 // OPTIMIZATION TASKS 
 // ------------------
 
-// Optimizing HTML, CSS and JavaScript 
-gulp.task('useref:index', function() {
+// Optimizing CSS
+gulp.task('styles:index', function() {
+    return gulp.src('app/css/*.css')
+        .pipe(cleanCSS({compatibility: 'ie8'}))
+        .pipe(gulp.dest('dist/css'));
+});
+
+// Optimizing CSS
+gulp.task('styles:views', function() {
+    return gulp.src('app/views/css/*.css')
+        .pipe(cleanCSS({compatibility: 'ie8'}))
+        .pipe(gulp.dest('dist/views/css'));
+});
+
+// Optimizing JavaScript 
+gulp.task('scripts:index', function() {
+    return gulp.src('app/js/*.js')
+        .pipe(jshint())
+        .pipe(jshint.reporter('default'))
+        .pipe(uglify())
+        .pipe(gulp.dest('dist/js'));
+});
+
+// Optimizing JavaScript 
+gulp.task('scripts:views', function() {
+    return gulp.src('app/views/js/*.js')
+        .pipe(jshint())
+        .pipe(jshint.reporter('default'))
+        .pipe(uglify())
+        .pipe(gulp.dest('dist/views/js'));
+});
+
+// Optimizing HTML
+gulp.task('content:index', function() {
     return gulp.src('app/*.html')
-        .pipe(useref())
-        .pipe(gulpif('*.html', htmlmin({collapseWhitespace: true, minifyCSS:true, minifyJS:true}) ))
-        .pipe(gulpif('*.js', uglify()))
-        .pipe(gulpif('*.css', minifyCss()))
+        .pipe(htmlmin({collapseWhitespace: true, minifyCSS:true, minifyJS:true}))
         .pipe(gulp.dest('dist'));
 });
 
-gulp.task('useref:views', function() {
+// Optimizing HTML
+gulp.task('content:views', function() {
     return gulp.src('app/views/*.html')
-        .pipe(useref())
-        .pipe(gulpif('*.html', htmlmin({collapseWhitespace: true, minifyCSS:true, minifyJS:true}) ))
-        .pipe(gulpif('*.js', uglify()))
-        .pipe(gulpif('*.css', minifyCss()))
+        .pipe(htmlmin({collapseWhitespace: true, minifyCSS:true, minifyJS:true}))
         .pipe(gulp.dest('dist/views'));
 });
 
 // Optimizing Images 
+// NOTE: IF I USE imagemin, PAGESPEED GIVES ME A LOWER SCORE: Properly formatting and compressing images can save many bytes of data.
 gulp.task('images:index', function() {
-    return gulp.src('app/img/*.+(png|jpg|gif|svg)')
-    .pipe(imagemin())
-    .pipe(gulp.dest('dist/img'));
+    return gulp.src('app/img/*.+(png|jpg)')
+        //.pipe(imagemin())
+        //.pipe(gulpif('*.png', imagemin({progressive: true, use: [optipng()]})))
+        //.pipe(gulpif('*.jpg', imagemin({progressive: true, use: [jpegtran()]})))
+        .pipe(gulp.dest('dist/img'));
 });
 
+
+// Optimizing Images
+// NOTE: IF I USE imagemin, PAGESPEED GIVES ME A LOWER SCORE: Properly formatting and compressing images can save many bytes of data.
 gulp.task('images:views', function() {
-    return gulp.src('app/views/images/*.+(png|jpg|gif|svg)')
-    .pipe(imagemin())
-    .pipe(gulp.dest('dist/views/images'));
+    return gulp.src('app/views/images/*.+(png|jpg)')
+        //.pipe(imagemin())
+        //.pipe(gulpif('*.png', imagemin({progressive: true, use: [optipng()]})))
+        //.pipe(gulpif('*.jpg', imagemin({progressive: true, use: [jpegtran()]})))
+        .pipe(gulp.dest('dist/views/images'));
 });
 
 // Cleaning 
@@ -79,5 +117,8 @@ gulp.task('default', function(callback) {
 
 
 gulp.task('build', function(callback){
-    runsequence('clean', ['useref:index','useref:views', 'images:index', 'images:views'], callback);
+    runsequence('clean', ['styles:index','styles:views',
+                        'scripts:index','scripts:views',
+                        'content:index','content:views',
+                        'images:index','images:views'], callback);
 });
