@@ -82,23 +82,21 @@ gulp.task('content:views', function() {
 });
 
 // Optimizing Images 
-// NOTE: IF I USE imagemin, PAGESPEED GIVES ME A LOWER SCORE: Properly formatting and compressing images can save many bytes of data.
 gulp.task('images:index', function() {
     return gulp.src('app/img/*.+(png|jpg)')
         //.pipe(imagemin())
-        //.pipe(gulpif('*.png', imagemin({progressive: true, use: [optipng()]})))
-        //.pipe(gulpif('*.jpg', imagemin({progressive: true, use: [jpegtran()]})))
+        .pipe(gulpif('*.png', imagemin({progressive: true, use: [optipng()]})))
+        .pipe(gulpif('*.jpg', imagemin({progressive: true, use: [jpegtran()]})))
         .pipe(gulp.dest('dist/img'));
 });
 
 
 // Optimizing Images
-// NOTE: IF I USE imagemin, PAGESPEED GIVES ME A LOWER SCORE: Properly formatting and compressing images can save many bytes of data.
 gulp.task('images:views', function() {
     return gulp.src('app/views/images/*.+(png|jpg)')
         //.pipe(imagemin())
-        //.pipe(gulpif('*.png', imagemin({progressive: true, use: [optipng()]})))
-        //.pipe(gulpif('*.jpg', imagemin({progressive: true, use: [jpegtran()]})))
+        .pipe(gulpif('*.png', imagemin({progressive: true, use: [optipng()]})))
+        .pipe(gulpif('*.jpg', imagemin({progressive: true, use: [jpegtran()]})))
         .pipe(gulp.dest('dist/views/images'));
 });
 

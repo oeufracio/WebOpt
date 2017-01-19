@@ -10,6 +10,9 @@ The first part of the project is to achieve a `PageSpeed` score of at least 90\1
 
 For the second part of the project, which involves `dist/views/pizza.html` and `dist/views/js/main.js`, you can open `dist/views/pizza.html` in your localhost.
 
+**NOTE**: I also host this project in AWS-S3, so you can use the next link in `PageSpeed`:
+
+http://odineufracio.com.s3-website-us-east-1.amazonaws.com/
 
 ## Build tools
 Gulp is used to automatically perform optimizations. There are two extra files:
